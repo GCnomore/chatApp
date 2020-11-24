@@ -15,35 +15,19 @@ export default class Start extends React.Component {
     this.state = {
       userName: '',
       color: '',
-      iconDisplay: '',
-      bg1: {
-        borderColor: '',
-        borderWidth: 0,
-      },
-      bg2: {
-        borderColor: '',
-        borderWidth: 0,
-      },
-      bg3: {
-        borderColor: '',
-        borderWidth: 0,
-      },
-      bg4: {
-        borderColor: '',
-        borderWidth: 0,
-      },
+      iconDisplay: true,
     };
   }
 
   handleInputChange(name) {
     if (name !== '') {
       this.setState({ userName: name });
-      this.setState({ iconDisplay: 'none' });
+      this.setState({ iconDisplay: false });
       return this.state.userName;
     }
     if (name === '') {
       this.setState({ userName: name });
-      this.setState({ iconDisplay: '' });
+      this.setState({ iconDisplay: true });
       return this.state.userName;
     }
   }
@@ -52,115 +36,146 @@ export default class Start extends React.Component {
     return (
       <ImageBackground
         source={require('../assets/BackgroundImage.png')}
-        style={styles.bgImage}
-      >
+        style={styles.bgImage}>
         <View style={styles.titleContainer}>
           <Text style={styles.appTitle}>KOKOA TALK</Text>
         </View>
         <View style={styles.overlay}>
           <View style={styles.inputContainer}>
-            <Image
-              style={[styles.icon, { display: this.state.iconDisplay }]}
-              source={require('../assets/icon1.png')}
-            />
+            {this.state.iconDisplay ? (
+              <Image
+                style={styles.icon}
+                source={require('../assets/icon1.png')}
+              />
+            ) : (
+              <Image></Image>
+            )}
+
             <TextInput
               style={styles.nameInput}
-              placeholder="       Your Name"
+              placeholder='       Your Name'
               onChangeText={(name) => this.handleInputChange(name)}
-              value={this.state.userName}
-            ></TextInput>
+              value={this.state.userName}></TextInput>
           </View>
           <View style={styles.bgOptionContainer}>
             <Text style={styles.chooseBg}>Choose Background Color:</Text>
             <View style={styles.bgColorContainer}>
-              <View
-                style={[
-                  styles.bgColorOutlayer,
-                  {
-                    borderWidth: this.state.bg1.borderWidth,
-                    borderColor: this.state.bg1.borderColor,
-                  },
-                ]}
-              >
-                <TouchableOpacity
-                  style={[styles.bgColor, styles.bgColor1]}
-                  onPress={() =>
-                    this.setState({
-                      color: '#090C08',
-                      bg1: { borderColor: 'gray', borderWidth: 3 },
-                      bg2: { borderColor: '', borderWidth: 0 },
-                      bg3: { borderColor: '', borderWidth: 0 },
-                      bg4: { borderColor: '', borderWidth: 0 },
-                    })
-                  }
-                ></TouchableOpacity>
-              </View>
-              <View
-                style={[
-                  styles.bgColorOutlayer,
-                  {
-                    borderWidth: this.state.bg2.borderWidth,
-                    borderColor: this.state.bg2.borderColor,
-                  },
-                ]}
-              >
-                <TouchableOpacity
-                  style={[styles.bgColor, styles.bgColor2]}
-                  onPress={() =>
-                    this.setState({
-                      color: '#474056',
-                      bg2: { borderColor: 'gray', borderWidth: 3 },
-                      bg1: { borderColor: '', borderWidth: 0 },
-                      bg3: { borderColor: '', borderWidth: 0 },
-                      bg4: { borderColor: '', borderWidth: 0 },
-                    })
-                  }
-                ></TouchableOpacity>
-              </View>
-              <View
-                style={[
-                  styles.bgColorOutlayer,
-                  {
-                    borderWidth: this.state.bg3.borderWidth,
-                    borderColor: this.state.bg3.borderColor,
-                  },
-                ]}
-              >
-                <TouchableOpacity
-                  style={[styles.bgColor, styles.bgColor3]}
-                  onPress={() =>
-                    this.setState({
-                      color: '#8A95A5',
-                      bg3: { borderColor: 'gray', borderWidth: 3 },
-                      bg1: { borderColor: '', borderWidth: 0 },
-                      bg2: { borderColor: '', borderWidth: 0 },
-                      bg4: { borderColor: '', borderWidth: 0 },
-                    })
-                  }
-                ></TouchableOpacity>
-              </View>
-              <View
-                style={[
-                  styles.bgColorOutlayer,
-                  {
-                    borderWidth: this.state.bg4.borderWidth,
-                    borderColor: this.state.bg4.borderColor,
-                  },
-                ]}
-              >
-                <TouchableOpacity
-                  style={[styles.bgColor, styles.bgColor4]}
-                  onPress={() =>
-                    this.setState({
-                      color: '#B9C6AE',
-                      bg4: { borderColor: 'gray', borderWidth: 3 },
-                      bg1: { borderColor: '', borderWidth: 0 },
-                      bg2: { borderColor: '', borderWidth: 0 },
-                      bg3: { borderColor: '', borderWidth: 0 },
-                    })
-                  }
-                ></TouchableOpacity>
-              </View>
+              {this.state.color === '#090C08' ? (
+                <View
+                  style={[
+                    styles.bgColorOutlayer,
+                    {
+                      borderWidth: 3,
+                      borderColor: 'gray',
+                      borderRadius: 50,
+                    },
+                  ]}>
+                  <TouchableOpacity
+                    style={[styles.bgColor, styles.bgColor1]}
+                    onPress={() =>
+                      this.setState({
+                        color: '#090C08',
+                      })
+                    }></TouchableOpacity>
+                </View>
+              ) : (
+                <View style={styles.bgColorOutlayer}>
+                  <TouchableOpacity
+                    style={[styles.bgColor, styles.bgColor1]}
+                    onPress={() =>
+                      this.setState({
+                        color: '#090C08',
+                      })
+                    }></TouchableOpacity>
+                </View>
+              )}
+              {this.state.color === '#474056' ? (
+                <View
+                  style={[
+                    styles.bgColorOutlayer,
+                    {
+                      borderWidth: 3,
+                      borderColor: 'gray',
+                      borderRadius: 50,
+                    },
+                  ]}>
+                  <TouchableOpacity
+                    style={[styles.bgColor, styles.bgColor2]}
+                    onPress={() =>
+                      this.setState({
+                        color: '#474056',
+                      })
+                    }></TouchableOpacity>
+                </View>
+              ) : (
+                <View style={styles.bgColorOutlayer}>
+                  <TouchableOpacity
+                    style={[styles.bgColor, styles.bgColor2]}
+                    onPress={() =>
+                      this.setState({
+                        color: '#474056',
+                      })
+                    }></TouchableOpacity>
+                </View>
+              )}
+              {this.state.color === '#8A95A5' ? (
+                <View
+                  style={[
+                    styles.bgColorOutlayer,
+                    {
+                      borderWidth: 3,
+                      borderColor: 'gray',
+                      borderRadius: 50,
+                    },
+                  ]}>
+                  <TouchableOpacity
+                    style={[styles.bgColor, styles.bgColor3]}
+                    onPress={() =>
+                      this.setState({
+                        color: '#8A95A5',
+                      })
+                    }></TouchableOpacity>
+                </View>
+              ) : (
+                <View style={[styles.bgColorOutlayer]}>
+                  <TouchableOpacity
+                    style={[styles.bgColor, styles.bgColor3]}
+                    onPress={() =>
+                      this.setState({
+                        color: '#8A95A5',
+                      })
+                    }></TouchableOpacity>
+                </View>
+              )}
+              {this.state.color === '#B9C6AE' ? (
+                <View
+                  style={[
+                    styles.bgColorOutlayer,
+                    {
+                      borderWidth: 3,
+                      borderColor: 'gray',
+                      borderRadius: 50,
+                    },
+                  ]}>
+                  <TouchableOpacity
+                    style={[styles.bgColor, styles.bgColor4]}
+                    onPress={() =>
+                      this.setState({
+                        color: '#B9C6AE',
+                      })
+                    }></TouchableOpacity>
+                </View>
+              ) : (
+                <View style={[styles.bgColorOutlayer]}>
+                  <TouchableOpacity
+                    style={[styles.bgColor, styles.bgColor4]}
+                    onPress={() =>
+                      this.setState({
+                        color: '#B9C6AE',
+                      })
+                    }></TouchableOpacity>
+                </View>
+              )}
             </View>
           </View>
           <View style={styles.btnContainer}>
@@ -171,8 +186,7 @@ export default class Start extends React.Component {
                   userName: this.state.userName,
                   color: this.state.color,
                 })
-              }
-            >
+              }>
               <Text style={styles.startBtnText}>Start Chatting</Text>
             </TouchableOpacity>
           </View>
@@ -191,7 +205,7 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     position: 'absolute',
-    top: 120,
+    top: 80,
   },
   appTitle: {
     fontSize: 45,
@@ -204,7 +218,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     position: 'absolute',
-    top: 380,
+    top: 320,
   },
   inputContainer: {
     width: '88%',
@@ -214,7 +228,7 @@ const styles = StyleSheet.create({
     height: 25,
     opacity: 0.5,
     position: 'absolute',
-    top: 40,
+    top: 30,
     left: 15,
   },
   nameInput: {
@@ -223,15 +237,15 @@ const styles = StyleSheet.create({
     color: '#757083',
     opacity: 0.5,
     borderWidth: 2,
-    padding: 20,
+    padding: 17,
     width: '100%',
     position: 'absolute',
-    top: 18,
+    top: 10,
   },
   bgOptionContainer: {
     width: '88%',
     position: 'absolute',
-    top: 120,
+    top: 90,
     left: 25,
   },
   chooseBg: {
@@ -244,42 +258,35 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     position: 'absolute',
     top: 35,
-    right: 20,
   },
   bgColorOutlayer: {
-    flex: 1,
-    width: 50,
+    width: 55,
     height: 55,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 55,
     marginRight: 5,
     marginLeft: 5,
   },
   bgColor: {
     width: 45,
     height: 45,
-    borderRadius: 50,
+    borderRadius: 45 / 2,
   },
   bgColor1: {
     backgroundColor: '#090C08',
-    borderColor: 'black',
   },
   bgColor2: {
     backgroundColor: '#474056',
-    borderColor: 'black',
   },
   bgColor3: {
     backgroundColor: '#8A95A5',
-    borderColor: 'black',
   },
   bgColor4: {
     backgroundColor: '#B9C6AE',
-    borderColor: 'black',
   },
   btnContainer: {
     position: 'absolute',
-    top: 235,
+    top: 195,
     width: '88%',
   },
   startBtn: {

@@ -39,10 +39,13 @@ export default class Start extends React.Component {
     return (
       <ImageBackground
         source={require('../assets/BackgroundImage.png')}
-        style={styles.bgImage}
-      >
+        style={styles.bgImage}>
         <View style={styles.titleContainer}>
-          <Text style={styles.appTitle}>KOKOA TALK</Text>
+          <Text
+            accessibilityLabel='Name of the application... Kokoa Talk'
+            style={styles.appTitle}>
+            KOKOA TALK
+          </Text>
         </View>
         <View style={styles.overlay}>
           <View style={styles.inputContainer}>
@@ -57,10 +60,9 @@ export default class Start extends React.Component {
 
             <TextInput
               style={styles.nameInput}
-              placeholder="       Your Name"
+              placeholder='           Your Name'
               onChangeText={(name) => this.handleInputChange(name)}
-              value={this.state.userName}
-            ></TextInput>
+              value={this.state.userName}></TextInput>
           </View>
           <View style={styles.bgOptionContainer}>
             <Text style={styles.chooseBg}>Choose Background Color:</Text>
@@ -75,27 +77,26 @@ export default class Start extends React.Component {
                       borderColor: 'gray',
                       borderRadius: 50,
                     },
-                  ]}
-                >
+                  ]}>
                   <TouchableOpacity
+                    accessibilityLabel='black background'
                     style={[styles.bgColor, styles.bgColor1]}
                     onPress={() =>
                       this.setState({
                         color: '#090C08',
                       })
-                    }
-                  ></TouchableOpacity>
+                    }></TouchableOpacity>
                 </View>
               ) : (
                 <View style={styles.bgColorOutlayer}>
                   <TouchableOpacity
+                    accessibilityLabel='black background'
                     style={[styles.bgColor, styles.bgColor1]}
                     onPress={() =>
                       this.setState({
                         color: '#090C08',
                       })
-                    }
-                  ></TouchableOpacity>
+                    }></TouchableOpacity>
                 </View>
               )}
               {this.state.color === '#474056' ? (
@@ -107,27 +108,26 @@ export default class Start extends React.Component {
                       borderColor: 'gray',
                       borderRadius: 50,
                     },
-                  ]}
-                >
+                  ]}>
                   <TouchableOpacity
+                    accessibilityLabel='dark mauve background'
                     style={[styles.bgColor, styles.bgColor2]}
                     onPress={() =>
                       this.setState({
                         color: '#474056',
                       })
-                    }
-                  ></TouchableOpacity>
+                    }></TouchableOpacity>
                 </View>
               ) : (
                 <View style={styles.bgColorOutlayer}>
                   <TouchableOpacity
+                    accessibilityLabel='dark mauve background'
                     style={[styles.bgColor, styles.bgColor2]}
                     onPress={() =>
                       this.setState({
                         color: '#474056',
                       })
-                    }
-                  ></TouchableOpacity>
+                    }></TouchableOpacity>
                 </View>
               )}
               {this.state.color === '#8A95A5' ? (
@@ -139,27 +139,26 @@ export default class Start extends React.Component {
                       borderColor: 'gray',
                       borderRadius: 50,
                     },
-                  ]}
-                >
+                  ]}>
                   <TouchableOpacity
+                    accessibilityLabel='light grey background'
                     style={[styles.bgColor, styles.bgColor3]}
                     onPress={() =>
                       this.setState({
                         color: '#8A95A5',
                       })
-                    }
-                  ></TouchableOpacity>
+                    }></TouchableOpacity>
                 </View>
               ) : (
                 <View style={[styles.bgColorOutlayer]}>
                   <TouchableOpacity
+                    accessibilityLabel='light grey background'
                     style={[styles.bgColor, styles.bgColor3]}
                     onPress={() =>
                       this.setState({
                         color: '#8A95A5',
                       })
-                    }
-                  ></TouchableOpacity>
+                    }></TouchableOpacity>
                 </View>
               )}
               {this.state.color === '#B9C6AE' ? (
@@ -171,27 +170,26 @@ export default class Start extends React.Component {
                       borderColor: 'gray',
                       borderRadius: 50,
                     },
-                  ]}
-                >
+                  ]}>
                   <TouchableOpacity
+                    accessibilityLabel='light olive background'
                     style={[styles.bgColor, styles.bgColor4]}
                     onPress={() =>
                       this.setState({
                         color: '#B9C6AE',
                       })
-                    }
-                  ></TouchableOpacity>
+                    }></TouchableOpacity>
                 </View>
               ) : (
                 <View style={[styles.bgColorOutlayer]}>
                   <TouchableOpacity
+                    accessibilityLabel='light olive background'
                     style={[styles.bgColor, styles.bgColor4]}
                     onPress={() =>
                       this.setState({
                         color: '#B9C6AE',
                       })
-                    }
-                  ></TouchableOpacity>
+                    }></TouchableOpacity>
                 </View>
               )}
             </View>
@@ -204,15 +202,14 @@ export default class Start extends React.Component {
                   userName: this.state.userName,
                   color: this.state.color,
                 })
-              }
-            >
+              }>
               <Text style={styles.startBtnText}>Start Chatting</Text>
             </TouchableOpacity>
           </View>
         </View>
         {/* This is for Android OS to avoid the keyboard blocking the visibility of input area  */}
         {Platform.OS === 'android' ? (
-          <KeyboardAvoidingView behavior="height" />
+          <KeyboardAvoidingView behavior='height' />
         ) : null}
       </ImageBackground>
     );
@@ -244,14 +241,15 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     width: '88%',
+    top: '3%',
   },
   icon: {
     width: 25,
     height: 25,
     opacity: 0.5,
     position: 'absolute',
-    top: 30,
-    left: 15,
+    top: 20,
+    left: '6%',
   },
   nameInput: {
     fontSize: 16,
@@ -262,12 +260,11 @@ const styles = StyleSheet.create({
     padding: 17,
     width: '100%',
     position: 'absolute',
-    top: 10,
   },
   bgOptionContainer: {
     width: '88%',
     position: 'absolute',
-    top: 90,
+    top: '35%',
     left: 25,
   },
   chooseBg: {
@@ -308,7 +305,7 @@ const styles = StyleSheet.create({
   },
   btnContainer: {
     position: 'absolute',
-    top: 240,
+    top: '74%',
     width: '88%',
   },
   startBtn: {

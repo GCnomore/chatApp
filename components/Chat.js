@@ -19,7 +19,7 @@ export default class Chat extends React.Component {
       messages: [
         {
           // Setting initial received message as an example
-          id: 1,
+          _id: 1,
           text: 'Hello developer',
           createdAt: new Date(),
           user: {
@@ -53,7 +53,16 @@ export default class Chat extends React.Component {
       // Setting text bubble's style
       <Bubble
         {...props}
-        wrapperStyle={{ right: { backgroundColor: '#000' } }}
+        wrapperStyle={{
+          right: { backgroundColor: '#3CAEA3' },
+          left: { backgroundColor: '#4a4a4a' },
+        }}
+        textStyle={{
+          left: { color: 'white' },
+        }}
+        timeTextStyle={{
+          left: { color: 'white' },
+        }}
       />
     );
   }
@@ -61,11 +70,11 @@ export default class Chat extends React.Component {
   render() {
     return (
       <View
+        accessibilityLabel="You've clicked the background... Left side shows opponent's message... Right side shows my message"
         style={[
           styles.chatContainer,
           { backgroundColor: this.props.route.params.color },
-        ]}
-      >
+        ]}>
         <GiftedChat
           renderBubble={this.renderBubble.bind(this)}
           messages={this.state.messages}
@@ -76,7 +85,7 @@ export default class Chat extends React.Component {
         />
         {/* This is for Android OS to avoid the keyboard blocking the visibility of input area  */}
         {Platform.OS === 'android' ? (
-          <KeyboardAvoidingView behavior="height" />
+          <KeyboardAvoidingView behavior='height' />
         ) : null}
       </View>
     );

@@ -7,6 +7,8 @@ import {
   View,
   ImageBackground,
   Image,
+  Platform,
+  KeyboardAvoidingView,
 } from 'react-native';
 
 export default class Start extends React.Component {
@@ -19,6 +21,7 @@ export default class Start extends React.Component {
     };
   }
 
+  // To show/hide icon inside the placeholder of name input field when the user starts typing
   handleInputChange(name) {
     if (name !== '') {
       this.setState({ userName: name });
@@ -36,7 +39,8 @@ export default class Start extends React.Component {
     return (
       <ImageBackground
         source={require('../assets/BackgroundImage.png')}
-        style={styles.bgImage}>
+        style={styles.bgImage}
+      >
         <View style={styles.titleContainer}>
           <Text style={styles.appTitle}>KOKOA TALK</Text>
         </View>
@@ -53,13 +57,15 @@ export default class Start extends React.Component {
 
             <TextInput
               style={styles.nameInput}
-              placeholder='       Your Name'
+              placeholder="       Your Name"
               onChangeText={(name) => this.handleInputChange(name)}
-              value={this.state.userName}></TextInput>
+              value={this.state.userName}
+            ></TextInput>
           </View>
           <View style={styles.bgOptionContainer}>
             <Text style={styles.chooseBg}>Choose Background Color:</Text>
             <View style={styles.bgColorContainer}>
+              {/* Conditional statment to only show border around the selected color option */}
               {this.state.color === '#090C08' ? (
                 <View
                   style={[
@@ -69,14 +75,16 @@ export default class Start extends React.Component {
                       borderColor: 'gray',
                       borderRadius: 50,
                     },
-                  ]}>
+                  ]}
+                >
                   <TouchableOpacity
                     style={[styles.bgColor, styles.bgColor1]}
                     onPress={() =>
                       this.setState({
                         color: '#090C08',
                       })
-                    }></TouchableOpacity>
+                    }
+                  ></TouchableOpacity>
                 </View>
               ) : (
                 <View style={styles.bgColorOutlayer}>
@@ -86,7 +94,8 @@ export default class Start extends React.Component {
                       this.setState({
                         color: '#090C08',
                       })
-                    }></TouchableOpacity>
+                    }
+                  ></TouchableOpacity>
                 </View>
               )}
               {this.state.color === '#474056' ? (
@@ -98,14 +107,16 @@ export default class Start extends React.Component {
                       borderColor: 'gray',
                       borderRadius: 50,
                     },
-                  ]}>
+                  ]}
+                >
                   <TouchableOpacity
                     style={[styles.bgColor, styles.bgColor2]}
                     onPress={() =>
                       this.setState({
                         color: '#474056',
                       })
-                    }></TouchableOpacity>
+                    }
+                  ></TouchableOpacity>
                 </View>
               ) : (
                 <View style={styles.bgColorOutlayer}>
@@ -115,7 +126,8 @@ export default class Start extends React.Component {
                       this.setState({
                         color: '#474056',
                       })
-                    }></TouchableOpacity>
+                    }
+                  ></TouchableOpacity>
                 </View>
               )}
               {this.state.color === '#8A95A5' ? (
@@ -127,14 +139,16 @@ export default class Start extends React.Component {
                       borderColor: 'gray',
                       borderRadius: 50,
                     },
-                  ]}>
+                  ]}
+                >
                   <TouchableOpacity
                     style={[styles.bgColor, styles.bgColor3]}
                     onPress={() =>
                       this.setState({
                         color: '#8A95A5',
                       })
-                    }></TouchableOpacity>
+                    }
+                  ></TouchableOpacity>
                 </View>
               ) : (
                 <View style={[styles.bgColorOutlayer]}>
@@ -144,7 +158,8 @@ export default class Start extends React.Component {
                       this.setState({
                         color: '#8A95A5',
                       })
-                    }></TouchableOpacity>
+                    }
+                  ></TouchableOpacity>
                 </View>
               )}
               {this.state.color === '#B9C6AE' ? (
@@ -156,14 +171,16 @@ export default class Start extends React.Component {
                       borderColor: 'gray',
                       borderRadius: 50,
                     },
-                  ]}>
+                  ]}
+                >
                   <TouchableOpacity
                     style={[styles.bgColor, styles.bgColor4]}
                     onPress={() =>
                       this.setState({
                         color: '#B9C6AE',
                       })
-                    }></TouchableOpacity>
+                    }
+                  ></TouchableOpacity>
                 </View>
               ) : (
                 <View style={[styles.bgColorOutlayer]}>
@@ -173,7 +190,8 @@ export default class Start extends React.Component {
                       this.setState({
                         color: '#B9C6AE',
                       })
-                    }></TouchableOpacity>
+                    }
+                  ></TouchableOpacity>
                 </View>
               )}
             </View>
@@ -186,21 +204,25 @@ export default class Start extends React.Component {
                   userName: this.state.userName,
                   color: this.state.color,
                 })
-              }>
+              }
+            >
               <Text style={styles.startBtnText}>Start Chatting</Text>
             </TouchableOpacity>
           </View>
         </View>
+        {/* This is for Android OS to avoid the keyboard blocking the visibility of input area  */}
+        {Platform.OS === 'android' ? (
+          <KeyboardAvoidingView behavior="height" />
+        ) : null}
       </ImageBackground>
     );
   }
 }
 
+// Contents' positions are fixed using absolute as instructed
 const styles = StyleSheet.create({
   bgImage: {
     flex: 1,
-    width: '100%',
-    height: '100%',
     alignItems: 'center',
   },
   titleContainer: {
@@ -286,7 +308,7 @@ const styles = StyleSheet.create({
   },
   btnContainer: {
     position: 'absolute',
-    top: 195,
+    top: 240,
     width: '88%',
   },
   startBtn: {

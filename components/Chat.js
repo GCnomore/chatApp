@@ -10,8 +10,9 @@ export default class Chat extends React.Component {
     super();
     this.state = {
       messages: [],
-      uid: '',
+      _id: '',
       avatar: '',
+      name: '',
     };
 
     var firebaseConfig = {
@@ -37,6 +38,7 @@ export default class Chat extends React.Component {
     // Go through each snapshots and add those data to current session (state)
     querySnapshot.forEach((message) => {
       var data = message.data();
+      console.log('col data', data);
       messages.push({
         _id: data._id,
         createdAt: data.createdAt.toDate(),
@@ -48,7 +50,7 @@ export default class Chat extends React.Component {
           system: data.user.system,
         },
       });
-      console.log(messages);
+      console.log('col update', messages);
     });
     this.setState({ messages });
   };
@@ -61,13 +63,17 @@ export default class Chat extends React.Component {
     this.setState((previousState) => ({
       messages: GiftedChat.append(previousState.messages, messages),
     }));
-
+    console.log('send', messages);
     // Adding sent message data to message collection's reference
     this.refMessages.add({
       _id: messages[0]._id,
       createdAt: messages[0].createdAt,
       text: messages[0].text,
-      user: messages[0].user,
+      user: {
+        _id: messages[0].user._id,
+        name: messages[0].user.name,
+        avatar: messages[0].user.avatar,
+      },
     });
   }
 
@@ -103,19 +109,20 @@ export default class Chat extends React.Component {
       if (!user) {
         await firebase.auth().signInAnonymously();
       }
-
       // Save user's info on current session (state)
       this.setState({
-        uid: user.uid,
-        name: this.props.route.params.name,
-        avatar: user.avatar,
+        _id: user.uid,
+        name: this.props.route.params.userName,
+        avatar: 'https://placeimg.com/140/140/any',
       });
+
+      console.log('mount', this.state);
 
       // Creating reference that has current user's documents. Ordering them by  date
       this.refAuthMessages = firebase
         .firestore()
         .collection('messages')
-        .where('user._id', '==', this.state.uid)
+        .where('user._id', '==', this.state._id)
         .orderBy('createdAt', 'desc');
 
       // Calling onCollectionsUpdate when current user's data changes (when received/sent new messages)
@@ -131,25 +138,27 @@ export default class Chat extends React.Component {
   }
 
   render() {
+    console.log('render', this.state);
     return (
       <View
         accessibilityLabel="You've clicked the background... Left side shows opponent's message... Right side shows my message"
         style={[
           styles.chatContainer,
           { backgroundColor: this.props.route.params.color },
-        ]}
-      >
+        ]}>
         <GiftedChat
           renderBubble={this.renderBubble.bind(this)}
           messages={this.state.messages}
           onSend={(messages) => this.onSend(messages)}
           user={{
-            _id: this.state.uid,
+            _id: this.state._id,
+            name: this.state.name,
+            avatar: this.state.avatar,
           }}
         />
         {/* This is for Android OS to avoid the keyboard blocking the visibility of input area  */}
         {Platform.OS === 'android' ? (
-          <KeyboardAvoidingView behavior="height" />
+          <KeyboardAvoidingView behavior='height' />
         ) : null}
       </View>
     );

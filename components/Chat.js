@@ -38,7 +38,7 @@ export default class Chat extends React.Component {
     // Go through each snapshots and add those data to current session (state)
     querySnapshot.forEach((message) => {
       var data = message.data();
-      console.log('col data', data);
+
       messages.push({
         _id: data._id,
         createdAt: data.createdAt.toDate(),
@@ -50,7 +50,6 @@ export default class Chat extends React.Component {
           system: data.user.system,
         },
       });
-      console.log('col update', messages);
     });
     this.setState({ messages });
   };
@@ -63,7 +62,7 @@ export default class Chat extends React.Component {
     this.setState((previousState) => ({
       messages: GiftedChat.append(previousState.messages, messages),
     }));
-    console.log('send', messages);
+
     // Adding sent message data to message collection's reference
     this.refMessages.add({
       _id: messages[0]._id,
@@ -96,12 +95,16 @@ export default class Chat extends React.Component {
     );
   }
 
+  getName() {
+    return this.props.route.params.userName;
+  }
+
   componentDidMount() {
     // Created reference for adding data purpose
     this.refMessages = firebase.firestore().collection('messages');
 
     // Setting setOptions' title to show current user's name on the nav bar
-    let name = this.props.route.params.userName;
+    var name = this.props.route.params.userName;
     this.props.navigation.setOptions({ title: name });
 
     this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
@@ -116,13 +119,10 @@ export default class Chat extends React.Component {
         avatar: 'https://placeimg.com/140/140/any',
       });
 
-      console.log('mount', this.state);
-
       // Creating reference that has current user's documents. Ordering them by  date
       this.refAuthMessages = firebase
         .firestore()
         .collection('messages')
-        .where('user._id', '==', this.state._id)
         .orderBy('createdAt', 'desc');
 
       // Calling onCollectionsUpdate when current user's data changes (when received/sent new messages)
@@ -138,7 +138,6 @@ export default class Chat extends React.Component {
   }
 
   render() {
-    console.log('render', this.state);
     return (
       <View
         accessibilityLabel="You've clicked the background... Left side shows opponent's message... Right side shows my message"

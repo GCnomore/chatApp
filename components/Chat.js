@@ -103,6 +103,7 @@ export default class Chat extends React.Component {
     );
   }
 
+  // If offline, get messages from AsyncStorage
   getMessages = async () => {
     let messages = '';
     try {
@@ -115,6 +116,7 @@ export default class Chat extends React.Component {
     }
   };
 
+  // Save messages to AsyncStorage (Accessible offline)
   saveMessages = async () => {
     try {
       await AsyncStorage.setItem(
@@ -126,6 +128,7 @@ export default class Chat extends React.Component {
     }
   };
 
+  // Do not render InputToolbar when offline
   renderInputToolbar(props) {
     console.log('rnder input', this.state);
     if (this.state.isConnected === false) {
@@ -144,6 +147,7 @@ export default class Chat extends React.Component {
     this.props.navigation.setOptions({ title: name });
 
     NetInfo.fetch().then((connection) => {
+      // If connected to internet
       if (connection.isConnected) {
         this.authUnsubscribe = firebase
           .auth()
@@ -193,8 +197,7 @@ export default class Chat extends React.Component {
         style={[
           styles.chatContainer,
           { backgroundColor: this.props.route.params.color },
-        ]}
-      >
+        ]}>
         <GiftedChat
           renderBubble={this.renderBubble.bind(this)}
           messages={this.state.messages}
@@ -208,7 +211,7 @@ export default class Chat extends React.Component {
         />
         {/* This is for Android OS to avoid the keyboard blocking the visibility of input area  */}
         {Platform.OS === 'android' ? (
-          <KeyboardAvoidingView behavior="height" />
+          <KeyboardAvoidingView behavior='height' />
         ) : null}
       </View>
     );

@@ -3,6 +3,11 @@ import { StyleSheet, View, Platform, KeyboardAvoidingView } from 'react-native';
 import { Bubble, GiftedChat, InputToolbar } from 'react-native-gifted-chat';
 import NetInfo from '@react-native-community/netinfo';
 import AsyncStorage from '@react-native-community/async-storage';
+import CustomActions from './CustomActions';
+import * as ImagePicker from 'expo-image-picker';
+import * as Permissions from 'expo-permissions';
+import * as Location from 'expo-location';
+import MapView, { Marker } from 'react-native-maps';
 
 const firebase = require('firebase');
 require('firebase/firestore');
@@ -32,7 +37,6 @@ export default class Chat extends React.Component {
       firebase.initializeApp(firebaseConfig);
       // firebase.analytics();
     }
-    console.log('const', this.state);
   }
 
   onCollectionUpdate = (querySnapshot) => {
@@ -41,7 +45,6 @@ export default class Chat extends React.Component {
     // Go through each snapshots and add those data to current session (state)
     querySnapshot.forEach((message) => {
       var data = message.data();
-
       messages.push({
         _id: data._id,
         createdAt: data.createdAt.toDate(),
@@ -52,12 +55,14 @@ export default class Chat extends React.Component {
           name: data.user.name,
           system: data.user.system,
         },
+        image: data.image,
       });
     });
     this.setState({ messages });
   };
 
   onSend(messages = []) {
+    console.log('onsend', messages);
     /*
       This func keeps appending previous message and new message to GiftedChat
       to render all conversation to screen.    
@@ -130,15 +135,35 @@ export default class Chat extends React.Component {
 
   // Do not render InputToolbar when offline
   renderInputToolbar(props) {
-    console.log('rnder input', this.state);
     if (this.state.isConnected === false) {
     } else {
       return <InputToolbar {...props} />;
     }
   }
 
+  renderCustomActions = (props) => {
+    return <CustomActions {...props} />;
+  };
+
+  renderCustomView(props) {
+    const { currentMessage } = props;
+    if (currentMessage.location) {
+      return (
+        <MapView
+          style={{ width: 150, height: 100, borderRadius: 13, margin: 3 }}
+          region={{
+            latitude: currentMessage.location.latitude,
+            longitude: currentMessage.location.longitude,
+            latitudeDelta: 0.0922,
+            logitudeDelta: 0.0421,
+          }}
+        />
+      );
+    }
+    return null;
+  }
+
   componentDidMount() {
-    console.log('mount', this.state);
     // Created reference for adding data purpose
     this.refMessages = firebase.firestore().collection('messages');
 
@@ -190,14 +215,14 @@ export default class Chat extends React.Component {
   }
 
   render() {
-    console.log('render', this.state);
     return (
       <View
         accessibilityLabel="You've clicked the background... Left side shows opponent's message... Right side shows my message"
         style={[
           styles.chatContainer,
           { backgroundColor: this.props.route.params.color },
-        ]}>
+        ]}
+      >
         <GiftedChat
           renderBubble={this.renderBubble.bind(this)}
           messages={this.state.messages}
@@ -208,10 +233,12 @@ export default class Chat extends React.Component {
             avatar: this.state.avatar,
           }}
           renderInputToolbar={this.renderInputToolbar.bind(this)}
+          renderActions={this.renderCustomActions}
+          renderCustomView={this.renderCustomView}
         />
         {/* This is for Android OS to avoid the keyboard blocking the visibility of input area  */}
         {Platform.OS === 'android' ? (
-          <KeyboardAvoidingView behavior='height' />
+          <KeyboardAvoidingView behavior="height" />
         ) : null}
       </View>
     );

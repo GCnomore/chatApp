@@ -5,6 +5,7 @@ import NetInfo from '@react-native-community/netinfo';
 import AsyncStorage from '@react-native-community/async-storage';
 import CustomActions from './CustomActions';
 import MapView from 'react-native-maps';
+import ImageModal from 'react-native-image-modal';
 
 const firebase = require('firebase');
 require('firebase/firestore');
@@ -60,7 +61,6 @@ export default class Chat extends React.Component {
   };
 
   onSend(messages = []) {
-    this.uploadImage(messages[0].image);
     /*
       This func keeps appending previous message and new message to GiftedChat
       to render all conversation to screen.    
@@ -71,22 +71,18 @@ export default class Chat extends React.Component {
       }),
       () => {
         this.saveMessages();
+
+        // Adding sent message data to message collection's reference -- Chat data format
+        this.refMessages.add({
+          _id: messages[0]._id,
+          createdAt: messages[0].createdAt,
+          text: messages[0].text || '',
+          user: messages[0].user,
+          location: messages[0].location || '',
+          image: messages[0].image || '',
+        });
       }
     );
-
-    // Adding sent message data to message collection's reference
-    this.refMessages.add({
-      _id: messages[0]._id,
-      createdAt: messages[0].createdAt,
-      text: messages[0].text || '',
-      user: {
-        _id: messages[0].user._id,
-        name: messages[0].user.name,
-        avatar: messages[0].user.avatar,
-      },
-      location: messages[0].location || '',
-      image: messages[0].image || '',
-    });
   }
 
   renderBubble(props) {
@@ -150,6 +146,7 @@ export default class Chat extends React.Component {
     if (currentMessage.location) {
       return (
         <MapView
+          accessibilityLabel='Snapshot of a map showing current location'
           style={{ width: 150, height: 100, borderRadius: 13, margin: 3 }}
           region={{
             latitude: currentMessage.location.latitude,
@@ -164,32 +161,20 @@ export default class Chat extends React.Component {
     return null;
   }
 
-  uploadImage = async (uri) => {
-    // Extrating imgaes name from uri
-    const nameFrom = uri.indexOf('ImagePicker/') + 12;
-    const imgName = uri.slice(nameFrom);
-
-    const blob = await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.onload = function () {
-        // ???
-        resolve(xhr.response);
-      };
-      xhr.onerror = function (e) {
-        console.log(e);
-        reject(new TypeError('Network request failed'));
-      };
-      xhr.responseType = 'blob';
-      xhr.open('GET', uri, true);
-      xhr.send(null);
-    });
-    // Creating reference of an image to upload with name
-    const ref = firebase.storage().ref().child(`${imgName}`);
-    const snapshot = await ref.put(blob);
-    blob.close();
-
-    return await snapshot.ref.getDownloadURL();
-  };
+  // Using ImageModal to get rid of Animated.event warning
+  renderMessageImage(props) {
+    return (
+      <View>
+        <ImageModal
+          swipeToDismiss={true}
+          resizeMode='contain'
+          imageBackgroundColor='#000000'
+          source={{ uri: props.currentMessage.image }}
+          style={{ width: 200, height: 200, borderRadius: 3 }}
+        />
+      </View>
+    );
+  }
 
   componentDidMount() {
     // Created reference for adding data purpose
@@ -249,8 +234,13 @@ export default class Chat extends React.Component {
         style={[
           styles.chatContainer,
           { backgroundColor: this.props.route.params.color },
-        ]}
-      >
+        ]}>
+        {/* {this.state.image && (
+          <ImageModal
+            source={{ uri: this.state.image }}
+            style={{ width: 200, height: 200 }}
+          />
+        )} */}
         <GiftedChat
           renderBubble={this.renderBubble.bind(this)}
           messages={this.state.messages}
@@ -263,10 +253,11 @@ export default class Chat extends React.Component {
           renderInputToolbar={this.renderInputToolbar.bind(this)}
           renderActions={this.renderCustomActions}
           renderCustomView={this.renderCustomView}
+          renderMessageImage={this.renderMessageImage}
         />
         {/* This is for Android OS to avoid the keyboard blocking the visibility of input area  */}
         {Platform.OS === 'android' ? (
-          <KeyboardAvoidingView behavior="height" />
+          <KeyboardAvoidingView behavior='height' />
         ) : null}
       </View>
     );

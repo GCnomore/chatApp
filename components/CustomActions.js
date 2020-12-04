@@ -5,6 +5,9 @@ import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
 
+const firebase = require('firebase');
+require('firebase/firestore');
+
 export default class CustomActions extends React.Component {
   state = {
     image: null,
@@ -12,9 +15,9 @@ export default class CustomActions extends React.Component {
 
   onActionPress = () => {
     const options = [
-      'Choose From Library',
+      'Choose a Photo From Library',
       'Take Picture',
-      'Send Location',
+      'Send Your Current Location',
       'Cancel',
     ];
     const cancelButtonIndex = options.length - 1;
@@ -52,8 +55,8 @@ export default class CustomActions extends React.Component {
       }).catch((error) => console.log(error));
 
       if (!result.cancelled) {
-        this.props.onSend({ image: result.uri });
-        this.props.uploadImage(result.uri);
+        const imgURL = await this.uploadImage(result.uri);
+        this.props.onSend({ image: imgURL });
       }
     }
   };
@@ -67,8 +70,8 @@ export default class CustomActions extends React.Component {
       }).catch((error) => console.log(error));
 
       if (!result.cancelled) {
-        this.props.onSend({ image: result.uri });
-        this.props.uploadImage(result.uri);
+        const imgURL = await this.uploadImage(result.uri);
+        this.props.onSend({ image: imgURL });
       }
     }
   };
@@ -89,15 +92,45 @@ export default class CustomActions extends React.Component {
     }
   };
 
+  uploadImage = async (uri) => {
+    // Extrating imgaes name from uri
+    const nameFrom = uri.indexOf('ImagePicker/') + 12;
+    const imgName = uri.slice(nameFrom);
+
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        // ???
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError('Network request failed'));
+      };
+      xhr.responseType = 'blob';
+      xhr.open('GET', uri, true);
+      xhr.send(null);
+    });
+    // Creating reference of an image to upload with name
+    const ref = firebase.storage().ref().child(`${imgName}`);
+    // Storing image to Firebse's storage
+    const snapshot = await ref.put(blob);
+    blob.close();
+
+    // Returns download url for uploaded image
+    return await snapshot.ref.getDownloadURL();
+  };
+
   render() {
     return (
-      <>
-        <TouchableOpacity style={styles.container} onPress={this.onActionPress}>
-          <View style={[styles.wrapper, this.props.wrapperStyle]}>
-            <Text style={[styles.iconText, this.props.iconTextStyle]}>+</Text>
-          </View>
-        </TouchableOpacity>
-      </>
+      <TouchableOpacity
+        accessibilityLabel='More function button'
+        style={styles.container}
+        onPress={this.onActionPress}>
+        <View style={[styles.wrapper, this.props.wrapperStyle]}>
+          <Text style={[styles.iconText, this.props.iconTextStyle]}>+</Text>
+        </View>
+      </TouchableOpacity>
     );
   }
 }

@@ -4,10 +4,7 @@ import { Bubble, GiftedChat, InputToolbar } from 'react-native-gifted-chat';
 import NetInfo from '@react-native-community/netinfo';
 import AsyncStorage from '@react-native-community/async-storage';
 import CustomActions from './CustomActions';
-import * as ImagePicker from 'expo-image-picker';
-import * as Permissions from 'expo-permissions';
-import * as Location from 'expo-location';
-import MapView, { Marker } from 'react-native-maps';
+import MapView from 'react-native-maps';
 
 const firebase = require('firebase');
 require('firebase/firestore');
@@ -56,13 +53,14 @@ export default class Chat extends React.Component {
           system: data.user.system,
         },
         image: data.image,
+        location: data.location,
       });
     });
     this.setState({ messages });
   };
 
   onSend(messages = []) {
-    console.log('onsend', messages);
+    this.uploadImage(messages[0].image);
     /*
       This func keeps appending previous message and new message to GiftedChat
       to render all conversation to screen.    
@@ -80,12 +78,14 @@ export default class Chat extends React.Component {
     this.refMessages.add({
       _id: messages[0]._id,
       createdAt: messages[0].createdAt,
-      text: messages[0].text,
+      text: messages[0].text || '',
       user: {
         _id: messages[0].user._id,
         name: messages[0].user.name,
         avatar: messages[0].user.avatar,
       },
+      location: messages[0].location || '',
+      image: messages[0].image || '',
     });
   }
 
@@ -155,13 +155,41 @@ export default class Chat extends React.Component {
             latitude: currentMessage.location.latitude,
             longitude: currentMessage.location.longitude,
             latitudeDelta: 0.0922,
-            logitudeDelta: 0.0421,
+            longitudeDelta: 0.0421,
           }}
+          showsUserLocation={true}
         />
       );
     }
     return null;
   }
+
+  uploadImage = async (uri) => {
+    // Extrating imgaes name from uri
+    const nameFrom = uri.indexOf('ImagePicker/') + 12;
+    const imgName = uri.slice(nameFrom);
+
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        // ???
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError('Network request failed'));
+      };
+      xhr.responseType = 'blob';
+      xhr.open('GET', uri, true);
+      xhr.send(null);
+    });
+    // Creating reference of an image to upload with name
+    const ref = firebase.storage().ref().child(`${imgName}`);
+    const snapshot = await ref.put(blob);
+    blob.close();
+
+    return await snapshot.ref.getDownloadURL();
+  };
 
   componentDidMount() {
     // Created reference for adding data purpose

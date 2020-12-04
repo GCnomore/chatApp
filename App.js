@@ -5,14 +5,10 @@ import Chat from './components/Chat';
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import CustomActions from './components/CustomActions';
 
 const Stack = createStackNavigator();
 
 export default class App extends React.Component {
-  renderCustomActions = (props) => {
-    return <CustomActions {...props} />;
-  };
   render() {
     return (
       <NavigationContainer style={styles.container}>

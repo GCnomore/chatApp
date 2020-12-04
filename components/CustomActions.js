@@ -53,6 +53,7 @@ export default class CustomActions extends React.Component {
 
       if (!result.cancelled) {
         this.props.onSend({ image: result.uri });
+        this.props.uploadImage(result.uri);
       }
     }
   };
@@ -67,6 +68,7 @@ export default class CustomActions extends React.Component {
 
       if (!result.cancelled) {
         this.props.onSend({ image: result.uri });
+        this.props.uploadImage(result.uri);
       }
     }
   };
@@ -77,7 +79,12 @@ export default class CustomActions extends React.Component {
       let result = await Location.getCurrentPositionAsync({});
 
       if (result) {
-        this.props.onSend(result);
+        this.props.onSend({
+          location: {
+            latitude: result.coords.latitude,
+            longitude: result.coords.longitude,
+          },
+        });
       }
     }
   };

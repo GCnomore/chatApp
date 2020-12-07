@@ -20,7 +20,7 @@ export default class Chat extends React.Component {
       name: '',
     };
 
-    var firebaseConfig = {
+    const firebaseConfig = {
       apiKey: 'AIzaSyDTfZbGc70PRFta61zpICpWDUgYSR5ru_U',
       authDomain: 'test-ed657.firebaseapp.com',
       databaseURL: 'https://test-ed657.firebaseio.com',
@@ -39,10 +39,9 @@ export default class Chat extends React.Component {
 
   onCollectionUpdate = (querySnapshot) => {
     const messages = [];
-
     // Go through each snapshots and add those data to current session (state)
     querySnapshot.forEach((message) => {
-      var data = message.data();
+      const data = message.data();
       messages.push({
         _id: data._id,
         createdAt: data.createdAt.toDate(),
@@ -181,7 +180,7 @@ export default class Chat extends React.Component {
     this.refMessages = firebase.firestore().collection('messages');
 
     // Setting setOptions' title to show current user's name on the nav bar
-    var name = this.props.route.params.userName;
+    const name = this.props.route.params.userName;
     this.props.navigation.setOptions({ title: name });
 
     NetInfo.fetch().then((connection) => {
@@ -235,12 +234,6 @@ export default class Chat extends React.Component {
           styles.chatContainer,
           { backgroundColor: this.props.route.params.color },
         ]}>
-        {/* {this.state.image && (
-          <ImageModal
-            source={{ uri: this.state.image }}
-            style={{ width: 200, height: 200 }}
-          />
-        )} */}
         <GiftedChat
           renderBubble={this.renderBubble.bind(this)}
           messages={this.state.messages}

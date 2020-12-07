@@ -22,13 +22,13 @@ export default class Start extends React.Component {
   }
 
   // To show/hide icon inside the placeholder of name input field when the user starts typing
-  handleInputChange(name) {
+  handleInputChange(name = 'Me') {
     if (name !== '') {
       this.setState({ userName: name });
       this.setState({ iconDisplay: false });
       return this.state.userName;
     }
-    if (name === '') {
+    if (name.length === 0) {
       this.setState({ userName: name });
       this.setState({ iconDisplay: true });
       return this.state.userName;

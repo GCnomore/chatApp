@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity, View, Text, StyleSheet, Alert } from 'react-native';
 import PropTypes from 'prop-types';
 import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
@@ -13,6 +13,22 @@ export default class CustomActions extends React.Component {
     image: null,
   };
 
+  // Function to show alert when error occurs
+  showAlert = (title, message) => {
+    return Alert.alert(
+      `${title}`,
+      `${message}`,
+      [
+        {
+          text: 'Close',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
+  // Create action sheet
   onActionPress = () => {
     const options = [
       'Choose a Photo From Library',
@@ -21,74 +37,110 @@ export default class CustomActions extends React.Component {
       'Cancel',
     ];
     const cancelButtonIndex = options.length - 1;
+    // Context == Redux Allows to pass props down to all components.
+    // Need to create an object defining actionSheet. GiftedChat expects function.
     this.context.actionSheet().showActionSheetWithOptions(
       {
         options,
         cancelButtonIndex,
       },
       async (buttonIndex) => {
-        switch (buttonIndex) {
-          case 0:
-            console.log('user wants to pick image');
-            this.pickImg();
-            return;
-          case 1:
-            console.log('user wants to take a photo');
-            this.takePhoto();
-            return;
-          case 2:
-            console.log('user wants to get their location');
-            this.getLocation();
-            return;
-          default:
+        try {
+          switch (buttonIndex) {
+            case 0:
+              console.log('user wants to pick image');
+              this.pickImg();
+              return;
+            case 1:
+              console.log('user wants to take a photo');
+              this.takePhoto();
+              return;
+            case 2:
+              console.log('user wants to get their location');
+              this.getLocation();
+              return;
+            default:
+          }
+        } catch (error) {
+          console.log(error.message);
+          this.showAlert('Location Error', "Can't get your location");
         }
       }
     );
   };
 
   pickImg = async () => {
-    const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+    try {
+      // Ask for user's permission to access their photo library
+      const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
 
-    if (status === 'granted') {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: 'Images',
-      }).catch((error) => console.log(error));
-
-      if (!result.cancelled) {
-        const imgURL = await this.uploadImage(result.uri);
-        this.props.onSend({ image: imgURL });
+      if (status === 'granted') {
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: 'Images',
+        }).catch((error) => console.log(error));
+        // Upload image when access granted.
+        if (!result.cancelled) {
+          const imgURL = await this.uploadImage(result.uri);
+          this.props.onSend({ image: imgURL });
+        }
       }
+    } catch (error) {
+      console.log(error);
+      this.showAlert(
+        'Photo library error',
+        'Error accessing photo library. Please try again.'
+      );
     }
   };
 
   takePhoto = async () => {
-    const { status } = await Permissions.askAsync(Permissions.CAMERA);
+    try {
+      // Ask for user's permission to access their camera
+      const { status } = await Permissions.askAsync(Permissions.CAMERA);
 
-    if (status === 'granted') {
-      let result = await ImagePicker.launchCameraAsync({
-        mediaTypes: 'Images',
-      }).catch((error) => console.log(error));
-
-      if (!result.cancelled) {
-        const imgURL = await this.uploadImage(result.uri);
-        this.props.onSend({ image: imgURL });
+      if (status === 'granted') {
+        let result = await ImagePicker.launchCameraAsync({
+          mediaTypes: 'Images',
+        }).catch((error) => console.log(error));
+        // Upload image when access granted.
+        if (!result.cancelled) {
+          const imgURL = await this.uploadImage(result.uri);
+          this.props.onSend({ image: imgURL });
+        }
       }
+    } catch (error) {
+      console.log(error.message);
+      this.showAlert(
+        'Camera Error',
+        "Can't access your camera. Please try again."
+      );
     }
   };
 
   getLocation = async () => {
-    const { status } = await Permissions.askAsync(Permissions.LOCATION);
-    if (status === 'granted') {
-      let result = await Location.getCurrentPositionAsync({});
+    try {
+      // Ask for user's permission to access their geolocation
+      const { status } = await Permissions.askAsync(Permissions.LOCATION);
+      if (status === 'granted') {
+        let result = await Location.getCurrentPositionAsync({});
 
-      if (result) {
-        this.props.onSend({
-          location: {
-            latitude: result.coords.latitude,
-            longitude: result.coords.longitude,
-          },
-        });
+        if (result) {
+          this.props.onSend({
+            location: {
+              latitude: result.coords.latitude,
+              longitude: result.coords.longitude,
+            },
+          });
+        }
       }
+    } catch (error) {
+      () => {
+        console.log(error.message);
+        this.showAlert(
+          'Location Error',
+          "Can't get your location. Please try again."
+        );
+      };
     }
   };
 
@@ -97,13 +149,13 @@ export default class CustomActions extends React.Component {
     const nameFrom = uri.indexOf('ImagePicker/') + 12;
     const imgName = uri.slice(nameFrom);
 
+    // Converts image uri into blob
     const blob = await new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
-      xhr.onload = function () {
-        // ???
+      xhr.onload = () => {
         resolve(xhr.response);
       };
-      xhr.onerror = function (e) {
+      xhr.onerror = (e) => {
         console.log(e);
         reject(new TypeError('Network request failed'));
       };

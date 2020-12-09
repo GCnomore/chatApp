@@ -1,4 +1,32 @@
-import React from 'react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Start.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Start.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React from 'react';
 import {
   StyleSheet,
   TouchableOpacity,
@@ -10,7 +38,6 @@ import {
   Platform,
   KeyboardAvoidingView,
 } from 'react-native';
-import PropTypes from 'prop-types';
 
 const backgroundImage = require('../assets/BackgroundImage.png');
 const icon = require('../assets/icon1.png');
@@ -119,6 +146,11 @@ const styles = StyleSheet.create({
   },
 });
 
+/**
+ * This component renders the main screen of the app.
+ * @name Start
+ * @global
+ */
 export default class Start extends React.Component {
   constructor(props) {
     super(props);
@@ -130,6 +162,14 @@ export default class Start extends React.Component {
   }
 
   // To show/hide icon inside the placeholder of name input field when the user starts typing
+
+  /**
+   * This method toggles the visibility of icon on user name input.
+   * Receives user name as parameter.
+   * @param {String} name
+   * @memberof Start
+   * @inner
+   */
   handleInputChange(name = 'Me') {
     const { userName } = this.state;
     if (name !== '') {
@@ -149,31 +189,31 @@ export default class Start extends React.Component {
     const { iconDisplay, userName, color } = this.state;
     const { navigation } = this.props;
     return (
-      <ImageBackground source={backgroundImage} style={styles.bgImage}>
-        <View style={styles.titleContainer}>
-          <Text
+      &lt;ImageBackground source={backgroundImage} style={styles.bgImage}>
+        &lt;View style={styles.titleContainer}>
+          &lt;Text
             accessibilityLabel='Name of the application... Kokoa Talk'
             style={styles.appTitle}>
             KOKOA TALK
-          </Text>
-        </View>
-        <View style={styles.overlay}>
-          <View style={styles.inputContainer}>
-            {iconDisplay && <Image style={styles.icon} source={icon} />}
+          &lt;/Text>
+        &lt;/View>
+        &lt;View style={styles.overlay}>
+          &lt;View style={styles.inputContainer}>
+            {iconDisplay &amp;&amp; &lt;Image style={styles.icon} source={icon} />}
 
-            <TextInput
+            &lt;TextInput
               style={styles.nameInput}
               placeholder='           Your Name'
               onChangeText={(name) => this.handleInputChange(name)}
               value={userName}
             />
-          </View>
-          <View style={styles.bgOptionContainer}>
-            <Text style={styles.chooseBg}>Choose Background Color:</Text>
-            <View style={styles.bgColorContainer}>
+          &lt;/View>
+          &lt;View style={styles.bgOptionContainer}>
+            &lt;Text style={styles.chooseBg}>Choose Background Color:&lt;/Text>
+            &lt;View style={styles.bgColorContainer}>
               {/* Conditional statment to only show border around the selected color option */}
               {color === '#090C08' ? (
-                <View
+                &lt;View
                   style={[
                     styles.bgColorOutlayer,
                     {
@@ -182,7 +222,7 @@ export default class Start extends React.Component {
                       borderRadius: 50,
                     },
                   ]}>
-                  <TouchableOpacity
+                  &lt;TouchableOpacity
                     accessibilityLabel='black background'
                     style={[styles.bgColor, styles.bgColor1]}
                     onPress={() =>
@@ -191,10 +231,10 @@ export default class Start extends React.Component {
                       })
                     }
                   />
-                </View>
+                &lt;/View>
               ) : (
-                <View style={styles.bgColorOutlayer}>
-                  <TouchableOpacity
+                &lt;View style={styles.bgColorOutlayer}>
+                  &lt;TouchableOpacity
                     accessibilityLabel='black background'
                     style={[styles.bgColor, styles.bgColor1]}
                     onPress={() =>
@@ -203,10 +243,10 @@ export default class Start extends React.Component {
                       })
                     }
                   />
-                </View>
+                &lt;/View>
               )}
               {color === '#474056' ? (
-                <View
+                &lt;View
                   style={[
                     styles.bgColorOutlayer,
                     {
@@ -215,7 +255,7 @@ export default class Start extends React.Component {
                       borderRadius: 50,
                     },
                   ]}>
-                  <TouchableOpacity
+                  &lt;TouchableOpacity
                     accessibilityLabel='dark mauve background'
                     style={[styles.bgColor, styles.bgColor2]}
                     onPress={() =>
@@ -224,10 +264,10 @@ export default class Start extends React.Component {
                       })
                     }
                   />
-                </View>
+                &lt;/View>
               ) : (
-                <View style={styles.bgColorOutlayer}>
-                  <TouchableOpacity
+                &lt;View style={styles.bgColorOutlayer}>
+                  &lt;TouchableOpacity
                     accessibilityLabel='dark mauve background'
                     style={[styles.bgColor, styles.bgColor2]}
                     onPress={() =>
@@ -236,10 +276,10 @@ export default class Start extends React.Component {
                       })
                     }
                   />
-                </View>
+                &lt;/View>
               )}
               {color === '#8A95A5' ? (
-                <View
+                &lt;View
                   style={[
                     styles.bgColorOutlayer,
                     {
@@ -248,7 +288,7 @@ export default class Start extends React.Component {
                       borderRadius: 50,
                     },
                   ]}>
-                  <TouchableOpacity
+                  &lt;TouchableOpacity
                     accessibilityLabel='light grey background'
                     style={[styles.bgColor, styles.bgColor3]}
                     onPress={() =>
@@ -257,10 +297,10 @@ export default class Start extends React.Component {
                       })
                     }
                   />
-                </View>
+                &lt;/View>
               ) : (
-                <View style={[styles.bgColorOutlayer]}>
-                  <TouchableOpacity
+                &lt;View style={[styles.bgColorOutlayer]}>
+                  &lt;TouchableOpacity
                     accessibilityLabel='light grey background'
                     style={[styles.bgColor, styles.bgColor3]}
                     onPress={() =>
@@ -269,10 +309,10 @@ export default class Start extends React.Component {
                       })
                     }
                   />
-                </View>
+                &lt;/View>
               )}
               {color === '#B9C6AE' ? (
-                <View
+                &lt;View
                   style={[
                     styles.bgColorOutlayer,
                     {
@@ -281,7 +321,7 @@ export default class Start extends React.Component {
                       borderRadius: 50,
                     },
                   ]}>
-                  <TouchableOpacity
+                  &lt;TouchableOpacity
                     accessibilityLabel='light olive background'
                     style={[styles.bgColor, styles.bgColor4]}
                     onPress={() =>
@@ -290,10 +330,10 @@ export default class Start extends React.Component {
                       })
                     }
                   />
-                </View>
+                &lt;/View>
               ) : (
-                <View style={[styles.bgColorOutlayer]}>
-                  <TouchableOpacity
+                &lt;View style={[styles.bgColorOutlayer]}>
+                  &lt;TouchableOpacity
                     accessibilityLabel='light olive background'
                     style={[styles.bgColor, styles.bgColor4]}
                     onPress={() =>
@@ -302,12 +342,12 @@ export default class Start extends React.Component {
                       })
                     }
                   />
-                </View>
+                &lt;/View>
               )}
-            </View>
-          </View>
-          <View style={styles.btnContainer}>
-            <TouchableOpacity
+            &lt;/View>
+          &lt;/View>
+          &lt;View style={styles.btnContainer}>
+            &lt;TouchableOpacity
               style={styles.startBtn}
               onPress={() =>
                 navigation.navigate('Chat', {
@@ -315,19 +355,38 @@ export default class Start extends React.Component {
                   color,
                 })
               }>
-              <Text style={styles.startBtnText}>Start Chatting</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+              &lt;Text style={styles.startBtnText}>Start Chatting&lt;/Text>
+            &lt;/TouchableOpacity>
+          &lt;/View>
+        &lt;/View>
         {/* This is for Android OS to avoid the keyboard blocking the visibility of input area  */}
         {Platform.OS === 'android' ? (
-          <KeyboardAvoidingView behavior='height' />
+          &lt;KeyboardAvoidingView behavior='height' />
         ) : null}
-      </ImageBackground>
+      &lt;/ImageBackground>
     );
   }
 }
+</code></pre>
+        </article>
+    </section>
 
-Start.propTypes = {
-  navigation: PropTypes.shape.isRequired,
-};
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#onSend">onSend</a></li><li><a href="global.html#Start">Start</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Dec 09 2020 02:25:12 GMT-0800 (Pacific Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

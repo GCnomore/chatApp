@@ -32,6 +32,14 @@ const styles = StyleSheet.create({
 
 export default class CustomActions extends React.Component {
   // Function to show alert when error occurs
+  /**
+   * Shows an alert when there's error among custom actions.
+   * @param {String} title
+   * @param {String} message
+   * @name showAlert
+   * @global
+   * @method
+   */
   showAlert = (title, message) =>
     Alert.alert(
       `${title}`,
@@ -46,7 +54,11 @@ export default class CustomActions extends React.Component {
     );
 
   /**
-   * Creates and define functionalities of each actions
+   * Creates and define functionalities of each actions and
+   * passes them as props using <code>context()</code>
+   * @name onActionPress
+   * @global
+   * @method
    */
   onActionPress = () => {
     const options = [
@@ -89,6 +101,17 @@ export default class CustomActions extends React.Component {
     );
   };
 
+  /**
+   * Ask for user's permission to access user's photo library.
+   * If access granted, it will let user pick an image from the library.
+   * Selected image will then sent to the chat using <code>{@link onSend|onSend}</code>
+   * and uploaded to Firebase storage
+   * by calling <code>{@link uploadImage|uploadImage}</code> method.
+   * @name pickImg
+   * @method
+   * @global
+   * @async
+   */
   pickImg = async () => {
     const { onSend } = this.props;
     try {
@@ -114,6 +137,17 @@ export default class CustomActions extends React.Component {
     }
   };
 
+  /**
+   * Ask for user's permission to access user's camera.
+   * If access granted, it will let user take a photo.
+   * Taken photo will then sent to the chat using <code>{@link onSend|onSend}</code>
+   * and uploaded to Firebase storage
+   * by calling <code>{@link uploadImage|uploadImage}</code> method.
+   * @name takePhoto
+   * @method
+   * @global
+   * @async
+   */
   takePhoto = async () => {
     const { onSend } = this.props;
     try {
@@ -139,6 +173,15 @@ export default class CustomActions extends React.Component {
     }
   };
 
+  /**
+   * Ask for user's permission to access user's location.
+   * If access granted, it will locate user and send snaphot of a map
+   * showing user's current location with <code>{@link onSend|onSend}</code> method.
+   * @name getLocation
+   * @method
+   * @global
+   * @async
+   */
   getLocation = async () => {
     const { onSend } = this.props;
     try {
@@ -167,6 +210,14 @@ export default class CustomActions extends React.Component {
     }
   };
 
+  /**
+   * This method turns image's URI in to BLOB and creates XML HTTP request to store BLOB
+   * into Firebase storage.
+   * @param {String} uri Image' URI
+   * @method
+   * @global
+   * @returns {String} DownloadURL of an image
+   */
   uploadImage = async (uri) => {
     // Extrating imgaes name from uri
     const nameFrom = uri.indexOf('ImagePicker/') + 12;

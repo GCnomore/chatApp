@@ -33,11 +33,18 @@ import NetInfo from '@react-native-community/netinfo';
 import AsyncStorage from '@react-native-community/async-storage';
 import MapView from 'react-native-maps';
 import ImageModal from 'react-native-image-modal';
+import PropTypes from 'prop-types';
 
 import CustomActions from './CustomActions';
 
 const firebase = require('firebase');
 require('firebase/firestore');
+
+const styles = StyleSheet.create({
+  chatContainer: {
+    flex: 1,
+  },
+});
 
 export default class Chat extends React.Component {
   constructor() {
@@ -66,6 +73,28 @@ export default class Chat extends React.Component {
     }
   }
 
+  /**
+   *  &lt;code>componentDidMount&lt;/code> will:
+   * &lt;ol>
+   *    &lt;li>Create reference of Firestore collection.&lt;/li>
+   *    &lt;li>Using &lt;code>NetInfo&lt;/code>, it will determine whether the browser is online or offline.&lt;/li>
+   *      &lt;ul>
+   *        &lt;li>Online: It will authorize user anonymously and load message data from Firestore. It will also subscribe to ref collection to update changes.&lt;br/>&lt;/li>
+   *        &lt;li>Offline: It will call &lt;code>getMessages&lt;/code> method and load message data from &lt;code>asyncStorage&lt;/code>&lt;/li>
+   *      &lt;/ul>
+   * &lt;/ol>
+   *
+   *  Misc:
+   * &lt;ol>
+   *    &lt;li>Receive user name from &lt;code>route&lt;/code> API and set it as navigation title to display user name
+   *       on top of the chat screen.&lt;/li>
+   *    &lt;li>Sends system message stating that the user has entered the chat.
+   *       ('${userName} has entered the chat')&lt;/li>
+   * &lt;/ol>
+   * @name componentDidMount
+   * @method
+   * @global
+   */
   componentDidMount() {
     // Created reference for adding data purpose
     this.refMessages = firebase.firestore().collection('messages');
@@ -85,13 +114,30 @@ export default class Chat extends React.Component {
     ];
     this.onSend(enterMessage);
 
+    // Using NetInfo to check whether the browser is connected to the internet
     NetInfo.fetch().then((connection) => {
-      // If connected to internet
       if (connection.isConnected) {
+        /**
+         * &lt;code>authUnsubscribe&lt;/code> is defined inside the &lt;code>componentDidMount&lt;/code>&lt;br/>
+         * &lt;br/>
+         * When the browser is connect to internet, &lt;code>authUnsubscribe&lt;/code> will:
+         * &lt;ol>
+         *  &lt;li>Create observer that listens to user's sign-in-sate change &lt;code>onAuthStateChanged&lt;/code>&lt;/li>
+         *  &lt;li>&lt;code>onAuthStateChanged&lt;/code> provides user object and return &lt;code>unsubscribe()&lt;/code>&lt;/li>
+         *  &lt;li>Check to see is there's user data.&lt;/li>
+         *    &lt;ul>
+         *      &lt;li>If no user data: Sign in anonymously&lt;/li>
+         *      &lt;li>If user data: Sets the state&lt;/li>
+         *    &lt;/ul>
+         * &lt;/ol>
+         * @name authUnsubscribe
+         */
         this.authUnsubscribe = firebase
           .auth()
+          // onAuthStateChanged provides user object and returns unsubscribe
           .onAuthStateChanged(async (user) => {
-            // Wait until user data is set
+            // Wait until user data is set. (This takes some time)
+            // If no user data, sign in anonymously
             if (!user) {
               await firebase.auth().signInAnonymously();
             }
@@ -101,7 +147,6 @@ export default class Chat extends React.Component {
               name,
               avatar: 'https://placeimg.com/140/140/any',
               isConnected: true,
-              createdAt: new Date(),
             });
 
             // Creating reference that has current user's documents. Ordering them by date
@@ -110,8 +155,15 @@ export default class Chat extends React.Component {
               .collection('messages')
               .orderBy('createdAt', 'desc');
 
-            // Calling onCollectionsUpdate when current user's data changes
-            // (when received/sent new messages)
+            // onSnapshot listens to changes on refAuthMessagese. It returns unsubscribe()
+            /**
+             * &lt;code>unsubscribeMessages&lt;/code> is defined inside the componentDidMount&lt;br/>
+             * &lt;br/>
+             * Calls &lt;code>onSnapshot&lt;/code> to listens to changes on Firestore collection
+             * and executes &lt;code>onCollectionUpdate&lt;/code>&lt;br/>
+             * &lt;code>onSnapshot&lt;/code> returns &lt;code>unsubscribe()&lt;/code>
+             * @name unsubscribeMessages
+             */
             this.unsubscribeMessages = this.refAuthMessages.onSnapshot(
               this.onCollectionUpdate
             );
@@ -123,23 +175,32 @@ export default class Chat extends React.Component {
     });
   }
 
+  /**
+   * &lt;code>componentWillUnmount&lt;/code> will call &lt;code>authUnsubscribe&lt;/code> and &lt;code>authUnsubscribe&lt;/code>
+   * before &lt;code>Chat&lt;/code> is unmounted to unsubscribe from both user's sign-in-state and ref collection.
+   * @method
+   * @global
+   */
   componentWillUnmount() {
-    if (this.state.isConnected) {
+    const { isConnected } = this.state;
+    if (isConnected) {
       this.authUnsubscribe();
       this.unsubscribeMessages();
     }
   }
 
   /**
-   * Receives message reference's snapshot and sets the state.
-   * @param {Object} querySnapshot
+   * Receives reference of collection's snapshot and sets messages state that will be rendered via &lt;code>GiftedChat&lt;/code>.
+   * @param {Array} querySnapshot Array of objects that contains message data.
+   * Message data can be accessed by &lt;code>querySnapshot[i].data()&lt;/code>
+   * @global
+   * @method
    */
   onCollectionUpdate = (querySnapshot) => {
     const messages = [];
     // Go through each snapshots and add those data to current session (state)
     querySnapshot.forEach((message) => {
       const data = message.data();
-      console.log(data);
       messages.push({
         _id: data._id,
         createdAt: data.createdAt.toDate(),
@@ -161,9 +222,28 @@ export default class Chat extends React.Component {
   };
 
   /**
-   * This func keeps appending new messages to messages state and GiftedChat to render
-   * all conversation to screen.
-   * @param {Array} messages
+   * This function keeps appending new messages to messages state for &lt;code>GiftedChat&lt;/code> to render
+   * all conversation to screen.&lt;br/>
+   * 2 functions are called in this method:&lt;br/>
+   * &lt;ul>
+   * &lt;li>{@link saveMessages|saveMessages} to save messages data to &lt;code>AsyncStorage&lt;/code>&lt;/li>&lt;br/>
+   * &lt;li>{@link addMessages|addMessages} to add message data to collection reference&lt;/li>
+   * &lt;/ul>
+   * @param {Array} messages Suggested format: &lt;br/>
+   * &lt;pre>
+   * {
+   *  _id: string,
+   *  createdAt: date,
+   *  text: string,
+   *  user: object,
+   *  location: object,
+   *  image: string,
+   *  system: boolean,
+   * }
+   * &lt;/pre>
+   * @name onSend
+   * @method
+   * @global
    */
   onSend(messages = []) {
     this.setState(
@@ -174,22 +254,21 @@ export default class Chat extends React.Component {
         this.saveMessages();
 
         // Adding sent message data to message collection's reference -- Chat data format
-        this.refMessages.add({
-          _id: messages[0]._id || Math.random(),
-          createdAt: messages[0].createdAt,
-          text: messages[0].text || '',
-          user: messages[0].user || '',
-          location: messages[0].location || '',
-          image: messages[0].image || '',
-          system: messages[0].system || '',
-        });
+        this.addMessages();
       }
     );
   }
 
   // If offline, get messages from AsyncStorage
+  /**
+   * Loads message data from &lt;code>messages&lt;/code> array in &lt;code>AsyncStorage&lt;/code> when offline.
+   * @name getMessages
+   * @global
+   * @method
+   * @async
+   */
   getMessages = async () => {
-    let messages = '';
+    let messages = [];
     try {
       messages = (await AsyncStorage.getItem('messages')) || [];
       this.setState({
@@ -201,29 +280,84 @@ export default class Chat extends React.Component {
   };
 
   // Save messages to AsyncStorage (Accessible offline)
+  /**
+   * Saves message data to &lt;code>messages&lt;/code> array in &lt;code>AsyncStorage&lt;/code>
+   * This helps to load messages faster and accessible while offline.
+   * @saveMessages
+   * @method
+   * @global
+   * @async
+   */
   saveMessages = async () => {
+    const { messages } = this.state;
     try {
-      await AsyncStorage.setItem(
-        'messages',
-        JSON.stringify(this.state.messages)
-      );
+      await AsyncStorage.setItem('messages', JSON.stringify(messages));
     } catch (error) {
       console.log(error.message);
     }
   };
 
+  // deleteMessages = async () => {
+  //   try {
+  //     await AsyncStorage.removeItem('messages');
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   }
+  // };
+
+  /**
+   * Get message data from current state and add is to Firestore collection.
+   * Undefined fields from message data will be saved as &lt;code>''&lt;/code> execpt &lt;code>_id&lt;/code> &lt;br/>
+   * When &lt;code>_id&lt;/code> is empty, it will be given &lt;code>Math.random().toString()&lt;/code>
+   * @name addMessages
+   * @global
+   * @method
+   */
+  addMessages() {
+    const message = this.state.messages[0];
+    this.refMessages.add({
+      _id: message._id || Math.random().toString(),
+      createdAt: message.createdAt,
+      text: message.text || '',
+      user: message.user || '',
+      location: message.location || '',
+      image: message.image || '',
+      system: message.system || '',
+    });
+  }
+
   // Do not render InputToolbar when offline
+  /**
+   * InputToolbar will not show when offline.
+   * @param {Object} props GiftedChat's props
+   * @returns {Component} &lt;code>InputTollbar&lt;/code> component
+   * @name renderInputToolbar
+   * @global
+   * @method
+   */
   renderInputToolbar(props) {
-    if (this.state.isConnected === false) {
+    const { isConnected } = this.state;
+    if (isConnected === false) {
     } else {
       return &lt;InputToolbar {...props} />;
     }
   }
 
-  renderCustomActions = (props) => {
-    return &lt;CustomActions {...props} />;
-  };
+  /**
+   * Shows available actions when pressed action button (+ button)
+   * @param {props} props GiftedChat's prop
+   */
+  renderCustomActions = (props) => &lt;CustomActions {...props} />;
 
+  /**
+   * Defining custom view for location share. &lt;code>MapView&lt;/code> component of
+   * &lt;code>react-native-map&lt;/code> is used to render user's location.
+   * @param {props} props GiftedChat's props. It will show user's current location. &lt;br/>
+   * width: 150, height: 100
+   * @method
+   * @global
+   * @returns {Component} &lt;code>MapView&lt;/code> Component
+   */
   renderCustomView(props) {
     const { currentMessage } = props;
     if (currentMessage.location) {
@@ -245,7 +379,15 @@ export default class Chat extends React.Component {
   }
 
   // Using ImageModal to get rid of Animated.event warning
-  renderMessageImage(props) {
+  /**
+   * Renders message's image with customized style. This method uses &lt;code>ImageModal&lt;/code> component of &lt;code>{@link https://github.com/dev-yakuza/react-native-image-modal| image modal}&lt;/code>
+   * @param {props} props GiftedChat's props
+   * @method
+   * @global
+   * @returns {Component} ImageModal
+   *
+   */
+  static renderMessageImage(props) {
     return (
       &lt;View>
         &lt;ImageModal
@@ -270,6 +412,11 @@ export default class Chat extends React.Component {
   //   this.refMessages.add(leaveMessage);
   // }
 
+  /**
+   * Renders chat bubble with customized style.
+   * @param {props} props GiftedChat's props
+   * @returns {Component} Bubble
+   */
   renderBubble(props) {
     return (
       // Setting text bubble's style
@@ -290,21 +437,21 @@ export default class Chat extends React.Component {
   }
 
   render() {
+    const { route } = this.props;
+    const { messages, _id, name, avatar } = this.state;
+    // this.deleteMessages();
     return (
       &lt;View
         accessibilityLabel="You've clicked the background... Left side shows opponent's message... Right side shows my message"
-        style={[
-          styles.chatContainer,
-          { backgroundColor: this.props.route.params.color },
-        ]}>
+        style={[styles.chatContainer, { backgroundColor: route.params.color }]}>
         &lt;GiftedChat
-          renderBubble={this.renderBubble.bind(this)}
-          messages={this.state.messages}
-          onSend={(messages) => this.onSend(messages)}
+          renderBubble={this.renderBubble}
+          messages={messages}
+          onSend={(message) => this.onSend(message)}
           user={{
-            _id: this.state._id,
-            name: this.state.name,
-            avatar: this.state.avatar,
+            _id,
+            name,
+            avatar,
           }}
           renderInputToolbar={this.renderInputToolbar.bind(this)}
           renderActions={this.renderCustomActions}
@@ -320,11 +467,10 @@ export default class Chat extends React.Component {
   }
 }
 
-const styles = StyleSheet.create({
-  chatContainer: {
-    flex: 1,
-  },
-});
+Chat.propTypes = {
+  route: PropTypes.shape.isRequired,
+  navigation: PropTypes.shape.isRequired,
+};
 </code></pre>
         </article>
     </section>
@@ -335,13 +481,13 @@ const styles = StyleSheet.create({
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#onSend">onSend</a></li><li><a href="global.html#Start">Start</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#addMessages">addMessages</a></li><li><a href="global.html#authUnsubscribe">authUnsubscribe</a></li><li><a href="global.html#componentDidMount">componentDidMount</a></li><li><a href="global.html#componentWillUnmount">componentWillUnmount</a></li><li><a href="global.html#getLocation">getLocation</a></li><li><a href="global.html#getMessages">getMessages</a></li><li><a href="global.html#onActionPress">onActionPress</a></li><li><a href="global.html#onCollectionUpdate">onCollectionUpdate</a></li><li><a href="global.html#onSend">onSend</a></li><li><a href="global.html#pickImg">pickImg</a></li><li><a href="global.html#renderBubble">renderBubble</a></li><li><a href="global.html#renderCustomView">renderCustomView</a></li><li><a href="global.html#renderInputToolbar">renderInputToolbar</a></li><li><a href="global.html#renderMessageImage">renderMessageImage</a></li><li><a href="global.html#saveMessages">saveMessages</a></li><li><a href="global.html#showAlert">showAlert</a></li><li><a href="global.html#takePhoto">takePhoto</a></li><li><a href="global.html#unsubscribeMessages">unsubscribeMessages</a></li><li><a href="global.html#uploadImage">uploadImage</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Dec 09 2020 02:25:12 GMT-0800 (Pacific Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Dec 09 2020 21:00:48 GMT-0800 (Pacific Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -36,14 +36,40 @@ import * as Location from 'expo-location';
 const firebase = require('firebase');
 require('firebase/firestore');
 
-export default class CustomActions extends React.Component {
-  state = {
-    image: null,
-  };
+const styles = StyleSheet.create({
+  container: {
+    width: 26,
+    height: 26,
+    marginLeft: 10,
+    marginBottom: 10,
+  },
+  wrapper: {
+    borderRadius: 13,
+    borderColor: '#b2b2b2',
+    borderWidth: 2,
+    flex: 1,
+  },
+  iconText: {
+    color: '#b2b2b2',
+    fontWeight: 'bold',
+    fontSize: 16,
+    backgroundColor: 'transparent',
+    textAlign: 'center',
+  },
+});
 
+export default class CustomActions extends React.Component {
   // Function to show alert when error occurs
-  showAlert = (title, message) => {
-    return Alert.alert(
+  /**
+   * Shows an alert when there's error among custom actions.
+   * @param {String} title
+   * @param {String} message
+   * @name showAlert
+   * @global
+   * @method
+   */
+  showAlert = (title, message) =>
+    Alert.alert(
       `${title}`,
       `${message}`,
       [
@@ -54,10 +80,13 @@ export default class CustomActions extends React.Component {
       ],
       { cancelable: false }
     );
-  };
 
   /**
-   * Creates and define functionalities of each actions
+   * Creates and define functionalities of each actions and
+   * passes them as props using &lt;code>context()&lt;/code>
+   * @name onActionPress
+   * @global
+   * @method
    */
   onActionPress = () => {
     const options = [
@@ -100,19 +129,31 @@ export default class CustomActions extends React.Component {
     );
   };
 
+  /**
+   * Ask for user's permission to access user's photo library.
+   * If access granted, it will let user pick an image from the library.
+   * Selected image will then sent to the chat using &lt;code>{@link onSend|onSend}&lt;/code>
+   * and uploaded to Firebase storage
+   * by calling &lt;code>{@link uploadImage|uploadImage}&lt;/code> method.
+   * @name pickImg
+   * @method
+   * @global
+   * @async
+   */
   pickImg = async () => {
+    const { onSend } = this.props;
     try {
       // Ask for user's permission to access their photo library
       const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
 
       if (status === 'granted') {
-        let result = await ImagePicker.launchImageLibraryAsync({
+        const result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: 'Images',
         }).catch((error) => console.log(error));
         // Upload image when access granted.
         if (!result.cancelled) {
           const imgURL = await this.uploadImage(result.uri);
-          this.props.onSend({ image: imgURL });
+          onSend({ image: imgURL });
         }
       }
     } catch (error) {
@@ -124,19 +165,31 @@ export default class CustomActions extends React.Component {
     }
   };
 
+  /**
+   * Ask for user's permission to access user's camera.
+   * If access granted, it will let user take a photo.
+   * Taken photo will then sent to the chat using &lt;code>{@link onSend|onSend}&lt;/code>
+   * and uploaded to Firebase storage
+   * by calling &lt;code>{@link uploadImage|uploadImage}&lt;/code> method.
+   * @name takePhoto
+   * @method
+   * @global
+   * @async
+   */
   takePhoto = async () => {
+    const { onSend } = this.props;
     try {
       // Ask for user's permission to access their camera
       const { status } = await Permissions.askAsync(Permissions.CAMERA);
 
       if (status === 'granted') {
-        let result = await ImagePicker.launchCameraAsync({
+        const result = await ImagePicker.launchCameraAsync({
           mediaTypes: 'Images',
         }).catch((error) => console.log(error));
         // Upload image when access granted.
         if (!result.cancelled) {
           const imgURL = await this.uploadImage(result.uri);
-          this.props.onSend({ image: imgURL });
+          onSend({ image: imgURL });
         }
       }
     } catch (error) {
@@ -148,15 +201,25 @@ export default class CustomActions extends React.Component {
     }
   };
 
+  /**
+   * Ask for user's permission to access user's location.
+   * If access granted, it will locate user and send snaphot of a map
+   * showing user's current location with &lt;code>{@link onSend|onSend}&lt;/code> method.
+   * @name getLocation
+   * @method
+   * @global
+   * @async
+   */
   getLocation = async () => {
+    const { onSend } = this.props;
     try {
       // Ask for user's permission to access their geolocation
       const { status } = await Permissions.askAsync(Permissions.LOCATION);
       if (status === 'granted') {
-        let result = await Location.getCurrentPositionAsync({});
+        const result = await Location.getCurrentPositionAsync({});
 
         if (result) {
-          this.props.onSend({
+          onSend({
             location: {
               latitude: result.coords.latitude,
               longitude: result.coords.longitude,
@@ -175,6 +238,14 @@ export default class CustomActions extends React.Component {
     }
   };
 
+  /**
+   * This method turns image's URI in to BLOB and creates XML HTTP request to store BLOB
+   * into Firebase storage.
+   * @param {String} uri Image' URI
+   * @method
+   * @global
+   * @returns {String} DownloadURL of an image
+   */
   uploadImage = async (uri) => {
     // Extrating imgaes name from uri
     const nameFrom = uri.indexOf('ImagePicker/') + 12;
@@ -201,17 +272,18 @@ export default class CustomActions extends React.Component {
     blob.close();
 
     // Returns download url for uploaded image
-    return await snapshot.ref.getDownloadURL();
+    return snapshot.ref.getDownloadURL();
   };
 
   render() {
+    const { wrapperStyle, iconTextStyle } = this.props;
     return (
       &lt;TouchableOpacity
         accessibilityLabel='More function button'
         style={styles.container}
         onPress={this.onActionPress}>
-        &lt;View style={[styles.wrapper, this.props.wrapperStyle]}>
-          &lt;Text style={[styles.iconText, this.props.iconTextStyle]}>+&lt;/Text>
+        &lt;View style={[styles.wrapper, wrapperStyle]}>
+          &lt;Text style={[styles.iconText, iconTextStyle]}>+&lt;/Text>
         &lt;/View>
       &lt;/TouchableOpacity>
     );
@@ -222,27 +294,11 @@ CustomActions.contextTypes = {
   actionSheet: PropTypes.func,
 };
 
-const styles = StyleSheet.create({
-  container: {
-    width: 26,
-    height: 26,
-    marginLeft: 10,
-    marginBottom: 10,
-  },
-  wrapper: {
-    borderRadius: 13,
-    borderColor: '#b2b2b2',
-    borderWidth: 2,
-    flex: 1,
-  },
-  iconText: {
-    color: '#b2b2b2',
-    fontWeight: 'bold',
-    fontSize: 16,
-    backgroundColor: 'transparent',
-    textAlign: 'center',
-  },
-});
+CustomActions.propTypes = {
+  wrapperStyle: PropTypes.shape.isRequired,
+  iconTextStyle: PropTypes.shape.isRequired,
+  onSend: PropTypes.func.isRequired,
+};
 </code></pre>
         </article>
     </section>
@@ -253,13 +309,13 @@ const styles = StyleSheet.create({
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#onSend">onSend</a></li><li><a href="global.html#Start">Start</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#addMessages">addMessages</a></li><li><a href="global.html#authUnsubscribe">authUnsubscribe</a></li><li><a href="global.html#componentDidMount">componentDidMount</a></li><li><a href="global.html#componentWillUnmount">componentWillUnmount</a></li><li><a href="global.html#getLocation">getLocation</a></li><li><a href="global.html#getMessages">getMessages</a></li><li><a href="global.html#onActionPress">onActionPress</a></li><li><a href="global.html#onCollectionUpdate">onCollectionUpdate</a></li><li><a href="global.html#onSend">onSend</a></li><li><a href="global.html#pickImg">pickImg</a></li><li><a href="global.html#renderBubble">renderBubble</a></li><li><a href="global.html#renderCustomView">renderCustomView</a></li><li><a href="global.html#renderInputToolbar">renderInputToolbar</a></li><li><a href="global.html#renderMessageImage">renderMessageImage</a></li><li><a href="global.html#saveMessages">saveMessages</a></li><li><a href="global.html#showAlert">showAlert</a></li><li><a href="global.html#takePhoto">takePhoto</a></li><li><a href="global.html#unsubscribeMessages">unsubscribeMessages</a></li><li><a href="global.html#uploadImage">uploadImage</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Dec 09 2020 02:25:12 GMT-0800 (Pacific Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Dec 09 2020 21:00:48 GMT-0800 (Pacific Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

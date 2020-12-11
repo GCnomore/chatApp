@@ -41,7 +41,6 @@ export default class Chat extends React.Component {
     // Initialize Firebase
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
-      // firebase.analytics();
     }
   }
 

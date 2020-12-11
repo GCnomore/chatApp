@@ -60,7 +60,7 @@ export default class Chat extends React.Component {
    * <ol>
    *    <li>Receive user name from <code>route</code> API and set it as navigation title to display user name
    *       on top of the chat screen.</li>
-   *    <li>Sends system message stating that the user has entered the chat.
+   *    <li>[WORKING] Sends system message stating that the user has entered the chat.
    *       ('${userName} has entered the chat')</li>
    * </ol>
    * @name componentDidMount
@@ -76,18 +76,11 @@ export default class Chat extends React.Component {
     const name = route.params.userName;
     navigation.setOptions({ title: name });
 
-    // Send system message stating a user has entered the chat
-    const enterMessage = [
-      {
-        text: `${name} has entered the chat`,
-        system: true,
-        createdAt: new Date(),
-      },
-    ];
-    this.onSend(enterMessage);
+    this.sendEnterMessage(name);
 
     // Using NetInfo to check whether the browser is connected to the internet
     NetInfo.fetch().then((connection) => {
+      console.log(connection);
       if (connection.isConnected) {
         /**
          * <code>authUnsubscribe</code> is defined inside the <code>componentDidMount</code><br/>
@@ -201,7 +194,7 @@ export default class Chat extends React.Component {
    * <li>{@link saveMessages|saveMessages} to save messages data to <code>AsyncStorage</code></li><br/>
    * <li>{@link addMessages|addMessages} to add message data to collection reference</li>
    * </ul>
-   * @param {Array} messages Suggested format: <br/>
+   * Suggested format: <br/>
    * <pre>
    * {
    *  _id: string,
@@ -213,6 +206,7 @@ export default class Chat extends React.Component {
    *  system: boolean,
    * }
    * </pre>
+   * @param {Array} messages Message data
    * @name onSend
    * @method
    * @global
@@ -240,7 +234,7 @@ export default class Chat extends React.Component {
    * @async
    */
   getMessages = async () => {
-    let messages = [];
+    let messages = '';
     try {
       messages = (await AsyncStorage.getItem('messages')) || [];
       this.setState({
@@ -359,7 +353,7 @@ export default class Chat extends React.Component {
    * @returns {Component} ImageModal
    *
    */
-  static renderMessageImage(props) {
+  renderMessageImage(props) {
     return (
       <View>
         <ImageModal
@@ -408,9 +402,26 @@ export default class Chat extends React.Component {
     );
   }
 
+  storageCheck = async () => {
+    console.log('ayncstorage', await AsyncStorage.getItem('messages'));
+  };
+
+  // Send system message stating a user has entered the chat
+  sendEnterMessage(name) {
+    const enterMessage = [
+      {
+        text: `${name} has entered the chat`,
+        system: true,
+        createdAt: new Date(),
+      },
+    ];
+    GiftedChat.append(enterMessage);
+  }
+
   render() {
     const { route } = this.props;
     const { messages, _id, name, avatar } = this.state;
+    this.storageCheck();
     // this.deleteMessages();
     return (
       <View
@@ -440,6 +451,6 @@ export default class Chat extends React.Component {
 }
 
 Chat.propTypes = {
-  route: PropTypes.shape.isRequired,
-  navigation: PropTypes.shape.isRequired,
+  route: PropTypes.object.isRequired,
+  navigation: PropTypes.object.isRequired,
 };

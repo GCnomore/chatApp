@@ -267,7 +267,7 @@ CustomActions.contextTypes = {
 };
 
 CustomActions.propTypes = {
-  wrapperStyle: PropTypes.shape.isRequired,
-  iconTextStyle: PropTypes.shape.isRequired,
+  wrapperStyle: PropTypes.object,
+  iconTextStyle: PropTypes.object,
   onSend: PropTypes.func.isRequired,
 };

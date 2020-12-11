@@ -153,7 +153,7 @@ When the browser is connect to internet, <code>authUnsubscribe</code> will:
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line92">line 92</a>
+        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line85">line 85</a>
     </li></ul></dd>
     
 
@@ -219,7 +219,7 @@ and executes <code>onCollectionUpdate</code><br/>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line131">line 131</a>
+        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line124">line 124</a>
     </li></ul></dd>
     
 
@@ -301,7 +301,7 @@ When <code>_id</code> is empty, it will be given <code>Math.random().toString()<
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line280">line 280</a>
+        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line274">line 274</a>
     </li></ul></dd>
     
 
@@ -359,7 +359,7 @@ When <code>_id</code> is empty, it will be given <code>Math.random().toString()<
 <ol>
    <li>Receive user name from <code>route</code> API and set it as navigation title to display user name
       on top of the chat screen.</li>
-   <li>Sends system message stating that the user has entered the chat.
+   <li>[WORKING] Sends system message stating that the user has entered the chat.
       ('${userName} has entered the chat')</li>
 </ol>
 </div>
@@ -494,7 +494,7 @@ before <code>Chat</code> is unmounted to unsubscribe from both user's sign-in-st
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line156">line 156</a>
+        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line149">line 149</a>
     </li></ul></dd>
     
 
@@ -672,7 +672,7 @@ showing user's current location with <code><a href="global.html#onSend">onSend</
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line235">line 235</a>
+        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line229">line 229</a>
     </li></ul></dd>
     
 
@@ -899,7 +899,7 @@ Message data can be accessed by <code>querySnapshot[i].data()</code></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line171">line 171</a>
+        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line164">line 164</a>
     </li></ul></dd>
     
 
@@ -950,6 +950,18 @@ all conversation to screen.<br/>
 <li><a href="global.html#saveMessages">saveMessages</a> to save messages data to <code>AsyncStorage</code></li><br/>
 <li><a href="global.html#addMessages">addMessages</a> to add message data to collection reference</li>
 </ul>
+Suggested format: <br/>
+<pre>
+{
+ _id: string,
+ createdAt: date,
+ text: string,
+ user: object,
+ location: object,
+ image: string,
+ system: boolean,
+}
+</pre>
 </div>
 
 
@@ -1001,18 +1013,7 @@ all conversation to screen.<br/>
 
             
 
-            <td class="description last">Suggested format: <br/>
-<pre>
-{
- _id: string,
- createdAt: date,
- text: string,
- user: object,
- location: object,
- image: string,
- system: boolean,
-}
-</pre></td>
+            <td class="description last">Message data</td>
         </tr>
 
     
@@ -1053,7 +1054,7 @@ all conversation to screen.<br/>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line196">line 196</a>
+        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line189">line 189</a>
     </li></ul></dd>
     
 
@@ -1282,7 +1283,7 @@ by calling <code><a href="global.html#uploadImage">uploadImage</a></code> method
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line392">line 392</a>
+        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line386">line 386</a>
     </li></ul></dd>
     
 
@@ -1443,7 +1444,7 @@ width: 150, height: 100</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line333">line 333</a>
+        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line327">line 327</a>
     </li></ul></dd>
     
 
@@ -1602,7 +1603,7 @@ width: 150, height: 100</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line302">line 302</a>
+        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line296">line 296</a>
     </li></ul></dd>
     
 
@@ -1761,7 +1762,7 @@ width: 150, height: 100</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line362">line 362</a>
+        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line356">line 356</a>
     </li></ul></dd>
     
 
@@ -1872,7 +1873,7 @@ This helps to load messages faster and accessible while offline.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line263">line 263</a>
+        <a href="Chat.js.html">Chat.js</a>, <a href="Chat.js.html#line257">line 257</a>
     </li></ul></dd>
     
 
@@ -2336,7 +2337,7 @@ into Firebase storage.
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Dec 09 2020 21:00:48 GMT-0800 (Pacific Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Thu Dec 10 2020 15:20:05 GMT-0800 (Pacific Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

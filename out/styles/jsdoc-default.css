@@ -372,8 +372,18 @@ tr > th:last-child {
   color: #454545;
 }
 
+pre {
+  padding: 16px !important;
+  overflow: auto !important;
+  font-size: 85% !important;
+  line-height: 1.45 !important;
+  background-color: #161b22 !important;
+  border-radius: 6px !important;
+  color: rgba(255, 255, 255, 0.733);
+}
+
 code {
-  background-color: #dedede !important;
-  font-weight: 600 !important;
+  font-weight: 600;
   padding: 1px;
+  background-color: #dedede;
 }

@@ -329,5 +329,5 @@ export default class Start extends React.Component {
 }
 
 Start.propTypes = {
-  navigation: PropTypes.shape.isRequired,
+  navigation: PropTypes.object.isRequired,
 };

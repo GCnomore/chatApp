@@ -55,7 +55,7 @@ Then run `npm install` to install dependencies.
 
 ### Configure Firebase
 - From your Firebase page, click the gear icon and click **Project Settings**
-- Under **Your App* section, click **Firestore for Web or </> icon**
+- Under **Your App** section, click **Firestore for Web or </> icon**
 - Fill in the name of your project and click **Register**
 - Copy the config object and paste it in **Chat.js**
 ```
